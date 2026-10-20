@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photoreal — version photoréaliste</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap">
+
+  <header class="hero">
+    <h1>Photoreal</h1>
+    <p class="tagline">Un personnage en dessin animé, recréé en photo. À l'identique.</p>
+  </header>
+
+  <section class="bento">
+
+    <!-- Upload -->
+    <div class="card card-upload">
+      <div class="card-label">1 · Image source</div>
+      <div class="drop" id="drop">
+        <input type="file" id="file" accept="image/*" hidden>
+        <div class="drop-inner" id="dropInner">
+          <div class="drop-plus">+</div>
+          <div class="drop-text">Glisse ton image ici<br><span class="muted">ou clique pour choisir</span></div>
+        </div>
+        <img id="preview" class="preview hidden" alt="aperçu">
+      </div>
+      <button class="btn" id="go" disabled>Rendre photoréaliste</button>
+    </div>
+
+    <!-- Result -->
+    <div class="card card-result">
+      <div class="card-label">2 · Résultat</div>
+      <div class="result" id="result">
+        <div class="result-empty" id="resultEmpty">Le résultat apparaîtra ici</div>
+        <div class="loader hidden" id="loader"><span class="spin"></span> Génération… (30-60 s)</div>
+        <img id="out" class="preview hidden" alt="résultat">
+        <div class="error hidden" id="error"></div>
+      </div>
+      <a class="btn" id="dl" hidden download="photoreal.jpg">Télécharger</a>
+    </div>
+
+    <!-- Steps -->
+    <div class="card card-step"><span class="num">1</span><span class="step-txt">Dépose un personnage, dessin ou photo</span></div>
+    <div class="card card-step"><span class="num">2</span><span class="step-txt">Gemini le recrée en version photoréaliste</span></div>
+    <div class="card card-step"><span class="num">3</span><span class="step-txt">Télécharge le résultat en 4K</span></div>
+    <div class="card card-tip"><span class="tip-txt">Astuce — image nette, de face, sur fond uni pour un meilleur rendu.</span></div>
+
+  </section>
+
+  <footer class="foot">
+    <span>Photoreal · généré par Gemini Nano Banana</span>
+  </footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
