@@ -11,6 +11,7 @@ const error = document.getElementById('error');
 
 let fileData = null;
 let fileMime = '';
+let resultUrl = null;
 
 function readFile(f) {
   if (!f || !f.type.startsWith('image/')) return;
@@ -54,10 +55,10 @@ go.addEventListener('click', async () => {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || ('Erreur ' + res.status));
+    resultUrl = data.url;
     const url = data.url + '?t=' + Date.now();
     out.src = url;
     out.classList.remove('hidden');
-    dl.href = url;
     dl.classList.remove('hidden');
   } catch (e) {
     error.textContent = 'Erreur : ' + e.message;
@@ -66,5 +67,27 @@ go.addEventListener('click', async () => {
   } finally {
     loader.classList.add('hidden');
     go.disabled = false;
+  }
+});
+
+// Enregistrer : partage natif (Photos) sur mobile, téléchargement sinon
+if (navigator.canShare && navigator.canShare({ files: [new File([''], 'x', { type: 'image/jpeg' })] })) {
+  dl.textContent = 'Enregistrer dans Photos';
+}
+dl.addEventListener('click', async () => {
+  if (!resultUrl) return;
+  try {
+    const blob = await (await fetch(resultUrl)).blob();
+    const file = new File([blob], 'morphh.jpg', { type: 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file] });
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'morphh.jpg';
+      a.click();
+    }
+  } catch (e) {
+    // partage annulé par l'utilisateur : on ignore
   }
 });

@@ -27,10 +27,15 @@ MODEL = "gemini-nano-banana-2.1"
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={GEMINI}"
 
 PROMPT = (
-    "Recreate this character as a photorealistic real person. "
+    "Recreate this character as a real person in a casual smartphone photo, "
+    "exactly as if someone had just taken it with a phone camera. "
     "Keep the exact same facial features, proportions, hairstyle, hair color, "
     "outfit, accessories and expression. "
-    "Photorealistic skin with natural pores and imperfections, studio photo, 4k."
+    "Natural everyday lighting — window light or outdoor daylight, no studio light, "
+    "no professional flash. Slightly imperfect amateur framing, realistic skin with "
+    "visible pores, fine lines, blemishes and subtle imperfections, natural relaxed "
+    "expression, ordinary real-world background. "
+    "Authentic candid phone-photo look, high resolution, 4k."
 )
 
 
