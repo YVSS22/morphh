@@ -6,6 +6,7 @@ Backend minimal : sert le frontend + POST /api/photoreal (image -> Gemini Nano B
 import base64
 import json
 import re
+import time
 import urllib.request
 import urllib.error
 from pathlib import Path
@@ -13,6 +14,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 BASE = Path(__file__).resolve().parent
 PORT = 8649
+OUT = BASE / "out"
 
 def _key(name):
     for line in Path("/root/.hermes/profiles/jorvas/.env").read_text().splitlines():
@@ -52,12 +54,15 @@ def gemini_photoreal(image_b64, mime):
 
 class Handler(BaseHTTPRequestHandler):
     def _send(self, code, body, ctype):
-        self.send_response(code)
-        self.send_header("Content-Type", ctype)
-        self.send_header("Content-Length", str(len(body)))
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(body)
+        try:
+            self.send_response(code)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
 
     def do_GET(self):
         path = self.path.split("?")[0]
@@ -67,6 +72,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, (BASE / "style.css").read_bytes(), "text/css")
         if path == "/app.js":
             return self._send(200, (BASE / "app.js").read_bytes(), "application/javascript")
+        if path.startswith("/out/"):
+            f = BASE / path.lstrip("/")
+            if f.is_file():
+                return self._send(200, f.read_bytes(), "image/jpeg")
         self._send(404, b"not found", "text/plain")
 
     def do_POST(self):
@@ -83,8 +92,10 @@ class Handler(BaseHTTPRequestHandler):
                 m = re.search(r"data:([^;]+);", head)
                 if m:
                     mime = m.group(1)
-            out = gemini_photoreal(img, mime)
-            self._send(200, json.dumps({"image": out, "mime": "image/jpeg"}).encode(),
+            out_b64 = gemini_photoreal(img, mime)
+            name = f"morphh_{int(time.time() * 1000)}.jpg"
+            (OUT / name).write_bytes(base64.b64decode(out_b64))
+            self._send(200, json.dumps({"url": f"/out/{name}"}).encode(),
                        "application/json")
         except urllib.error.HTTPError as e:
             self._send(e.code, e.read(), "application/json")
@@ -96,6 +107,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    OUT.mkdir(exist_ok=True)
     srv = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
-    print(f"Photoreal sur http://0.0.0.0:{PORT}")
+    print(f"Morphh sur http://0.0.0.0:{PORT}")
     srv.serve_forever()

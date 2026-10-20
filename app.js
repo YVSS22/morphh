@@ -54,9 +54,10 @@ go.addEventListener('click', async () => {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || ('Erreur ' + res.status));
-    out.src = 'data:' + (data.mime || 'image/jpeg') + ';base64,' + data.image;
+    const url = data.url + '?t=' + Date.now();
+    out.src = url;
     out.classList.remove('hidden');
-    dl.href = out.src;
+    dl.href = url;
     dl.classList.remove('hidden');
   } catch (e) {
     error.textContent = 'Erreur : ' + e.message;
